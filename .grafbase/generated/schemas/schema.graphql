@@ -1,6 +1,0 @@
-extend schema
-  @auth(
-    rules: [
-      { allow: public }
-    ]
-  )
