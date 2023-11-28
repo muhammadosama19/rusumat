@@ -1,30 +1,40 @@
-import { g, config, auth } from '@grafbase/sdk';
+import { g,config, connector } from '@grafbase/sdk'
 
-const Project = g.model('Project', {
-  title: g.string().length({ min: 3 }),
-  description: g.string(), 
-  image: g.url(),
-  liveSiteUrl: g.url(), 
-  githubUrl: g.url(), 
-  category: g.string().search(),
-  createdBy: g.relation(() => User),
+
+
+const produce = g.type('Produce', {
+  name: g.string(),
+  quantity: g.int(),
+  price: g.float(),
+  nutrients: g.string().optional().list().optional(),
 })
 
-const User = g.model('User', {
-  name: g.string().length({ min: 2, max: 100 }),
-  email: g.string().unique(),
+const User = g.type('User', {
+  name: g.string(),
+  email: g.string(),
   avatarUrl: g.url(),
-  description: g.string().length({ min: 2, max: 1000 }).optional(),
+  description: g.string().optional(),
   githubUrl: g.url().optional(),
   linkedinUrl: g.url().optional(), 
-  projects: g.relation(() => Project).list().optional(),
 })
 
-const admin = g.model('Admin', {
-  name: g.string().optional(),
-  email: g.email().optional(),
-  gravatar: g.url().optional(),
-})
 export default config({
-  schema: g
+  schema: g,
+  experimental: {
+    ai: true,
+  },
+  auth: {
+    rules: (rules) => {
+      rules.public()
+    },
+  },
+  cache: {
+    rules: [
+      {
+        types: ['Query'],
+        maxAge: 50,
+        staleWhileRevalidate: 60
+      }
+    ]
+  }
 })
